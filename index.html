@@ -3,49 +3,59 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>電通大生専用マッチングアプリ</title>
+    <title>北海道情報大生専用マッチングアプリ</title>
 
     <meta
       name="description"
-      content="電通大生による、電通大生のためのマッチングアプリ"
+      content="北海道情報大生による、北海道情報大生のためのマッチングアプリ"
     />
 
-    <meta property="og:title" content="電通大生専用マッチングアプリ" />
+    <meta property="og:title" content="北海道情報大生専用マッチングアプリ" />
     <meta
       property="og:description"
-      content="電通大生による、電通大生のためのマッチングアプリ"
+      content="北海道情報大生による、北海道情報大生のためのマッチングアプリ"
     />
     <meta
       property="og:url"
-      content="https://uec-matching.mimifuwacc.workers.dev/"
+      content="https://hiu-matching.supurazako.com/"
     />
     <meta
       property="og:image"
-      content="https://uec-matching.mimifuwacc.workers.dev/og.png"
+      content="https://hiu-matching.supurazako.com/og.png"
     />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="電通大生専用マッチングアプリ" />
+    <meta property="og:site_name" content="北海道情報大生専用マッチングアプリ" />
 
-    <meta name="twitter:title" content="電通大生専用マッチングアプリ" />
+    <meta name="twitter:title" content="北海道情報大生専用マッチングアプリ" />
     <meta
       name="twitter:description"
-      content="電通大生による、電通大生のためのマッチングアプリ"
+      content="北海道情報大生による、北海道情報大生のためのマッチングアプリ"
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:image"
-      content="https://uec-matching.mimifuwacc.workers.dev/og.png"
+      content="https://hiu-matching.supurazako.com/og.png"
     />
   </head>
   <body>
     <header>
-      <h1>電通大生専用マッチングアプリ</h1>
+      <h1>北海道情報大生専用マッチングアプリ</h1>
     </header>
     <main>
       <section id="question">
-        <p>あなたは電通大生ですか？</p>
+        <p>あなたは北海道情報大生ですか？</p>
         <button id="yes">はい</button>
         <button id="no">いいえ</button>
+      </section>
+      <section id="input-section" style="display: none">
+        <p>あなたの名前を入力してください</p>
+        <input
+          id="target-input"
+          type="text"
+          placeholder="例: 北海道情報大学"
+          aria-label="あなたの名前"
+        />
+        <button id="judge">判定する</button>
       </section>
       <section id="retry" style="display: none">
         <button id="retry">再マッチング</button>
@@ -63,13 +73,17 @@
         inspired by
         <a href="https://hutinoatari.github.io/cheapTransfer/">最安経路検索</a>
       </p>
+      <p>
+        forked from
+        <a href="https://github.com/mimifuwacc/uec-matching/">電通大生専用マッチングアプリ</a>
+      </p>
 
       <p>
         ©
         <script>
           document.write(new Date().getFullYear());
         </script>
-        mimifuwacc
+        supurazako
       </p>
     </footer>
 
@@ -78,6 +92,10 @@
       const yesButton = questionSection.querySelector("#yes");
       const noButton = questionSection.querySelector("#no");
 
+      const inputSection = document.querySelector("#input-section");
+      const input = inputSection.querySelector("#target-input");
+      const judgeButton = inputSection.querySelector("#judge");
+
       const retrySection = document.querySelector("#retry");
       const retryButton = retrySection.querySelector("#retry");
       const restartButton = retrySection.querySelector("#restart");
@@ -85,10 +103,54 @@
       const resultSection = document.querySelector("#result");
       const resultText = resultSection.querySelector("#result-text");
 
-      const match = async () => {
-        questionSection.style.display = "none";
+      const normalize = (value) => value.replace(/\s+/g, "").trim();
+
+      const judgeMatch = (rawValue) => {
+        const value = normalize(rawValue);
+
+        if (!value) {
+          return {
+            label: "入力エラー",
+            description: "文字列を入力してください",
+          };
+        }
+
+        if (/^北海道情報大学$/u.test(value)) {
+          return {
+            label: "完全一致",
+            description: `「${rawValue}」さんは、北海道情報大学と運命的なマッチングが成立しました`,
+          };
+        }
+
+        if (/^北海道情報大$/u.test(value)) {
+          return {
+            label: "略称一致",
+            description: `「${rawValue}」さんは、北海道情報大学とかなり良い感じにマッチしました`,
+          };
+        }
+
+        if (
+          /北海道.*情報.*大学/u.test(value) ||
+          /^情報大学$/u.test(value) ||
+          /^北海道情報/u.test(value)
+        ) {
+          return {
+            label: "部分一致",
+            description: `「${rawValue}」さんと北海道情報大学はいい雰囲気になれそうです`,
+          };
+        }
+
+        return {
+          label: "不一致",
+          description: `「${rawValue}」さんにマッチする人は見つかりませんでした`,
+        };
+      };
+
+      const showResult = async () => {
+        const rawValue = input.value;
+
+        inputSection.style.display = "none";
         resultSection.style.display = "block";
-        console.log(resultSection);
         resultText.textContent = "マッチング中";
 
         await new Promise((resolve) => {
@@ -98,39 +160,58 @@
                 resultText.textContent += ".";
                 if (i === 4) resolve();
               },
-              (i + 1) * 500,
+              (i + 1) * 250,
             );
           }
         });
 
-        retrySection.style.display = "block";
+        const result = judgeMatch(rawValue);
 
-        resultText.textContent = "あなたにマッチする人は見つかりませんでした";
+        retrySection.style.display = "block";
+        retryButton.style.display = "inline-block";
+        restartButton.style.display = "inline-block";
+        resultText.textContent = `マッチング結果: ${result.label} / ${result.description}`;
       };
 
-      yesButton.addEventListener("click", async () => {
-        await match();
+      yesButton.addEventListener("click", () => {
+        questionSection.style.display = "none";
+        inputSection.style.display = "block";
+        input.focus();
       });
 
       noButton.addEventListener("click", () => {
         questionSection.style.display = "none";
-
+        inputSection.style.display = "none";
         retrySection.style.display = "block";
         retryButton.style.display = "none";
         restartButton.style.display = "inline-block";
-
         resultSection.style.display = "block";
-        resultText.textContent = "電通大生以外は利用することができません";
+        resultText.textContent = "北海道情報大生以外は利用することができません";
       });
 
-      retryButton.addEventListener("click", async () => {
-        await match();
+      judgeButton.addEventListener("click", async () => {
+        await showResult();
+      });
+
+      retryButton.addEventListener("click", () => {
+        retrySection.style.display = "none";
+        resultSection.style.display = "none";
+        inputSection.style.display = "block";
+        input.focus();
       });
 
       restartButton.addEventListener("click", () => {
+        input.value = "";
         retrySection.style.display = "none";
         resultSection.style.display = "none";
+        inputSection.style.display = "none";
         questionSection.style.display = "block";
+      });
+
+      input.addEventListener("keydown", async (event) => {
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        await showResult();
       });
     </script>
   </body>

@@ -1,5 +1,5 @@
-# UEC-matching
+# HIU-matching
 
-電通大生による、電通大生のためのマッチングアプリ
+北海道情報大生による、北海道情報大生のためのマッチングアプリです。
 
-https://uec-matching.mimifuwacc.workers.dev/
+fork from https://github.com/mimifuwacc/uec-matching
