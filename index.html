@@ -109,24 +109,15 @@
         const value = normalize(rawValue);
 
         if (!value) {
-          return {
-            label: "入力エラー",
-            description: "文字列を入力してください",
-          };
+          return "文字列を入力してください";
         }
 
         if (/^北海道情報大学$/u.test(value)) {
-          return {
-            label: "完全一致",
-            description: `「${rawValue}」さんは、北海道情報大学と運命的なマッチングが成立しました`,
-          };
+          return `「${rawValue}」さんは、北海道情報大学と運命的なマッチングが成立しました`;
         }
 
         if (/^北海道情報大$/u.test(value)) {
-          return {
-            label: "略称一致",
-            description: `「${rawValue}」さんは、北海道情報大学とかなり良い感じにマッチしました`,
-          };
+          return `「${rawValue}」さんは、北海道情報大学とかなり良い感じにマッチしました`;
         }
 
         if (
@@ -134,16 +125,10 @@
           /^情報大学$/u.test(value) ||
           /^北海道情報/u.test(value)
         ) {
-          return {
-            label: "部分一致",
-            description: `「${rawValue}」さんと北海道情報大学はいい雰囲気になれそうです`,
-          };
+          return `「${rawValue}」さんと北海道情報大学はいい雰囲気になれそうです`;
         }
 
-        return {
-          label: "不一致",
-          description: `「${rawValue}」さんにマッチする人は見つかりませんでした`,
-        };
+        return `「${rawValue}」さんにマッチする人は見つかりませんでした`;
       };
 
       const showResult = async () => {
@@ -170,7 +155,7 @@
         retrySection.style.display = "block";
         retryButton.style.display = "inline-block";
         restartButton.style.display = "inline-block";
-        resultText.textContent = `マッチング結果: ${result.label} / ${result.description}`;
+        resultText.textContent = result;
       };
 
       yesButton.addEventListener("click", () => {
